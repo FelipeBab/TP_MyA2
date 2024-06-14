@@ -41,6 +41,7 @@ public class Sudoku : MonoBehaviour {
         frequency = frequency * Mathf.Pow(r, 2);
         CreateEmptyBoard();
         ClearBoard();
+        CreateNew();
     }
 
     void ClearBoard() {
@@ -74,7 +75,7 @@ public class Sudoku : MonoBehaviour {
     {
         watchdog++;
 
-        if (watchdog >= 10000)
+        if (watchdog >= 100000)
         {
             return false;//ver bien esto
         }
