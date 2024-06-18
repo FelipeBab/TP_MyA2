@@ -71,18 +71,26 @@ public class Sudoku : MonoBehaviour {
 
 	//IMPLEMENTAR
 	int watchdog = 0;
-	bool RecuSolve(Matrix<int> matrixParent, int x, int y, int protectMaxDepth, List<Matrix<int>> solution)
+	bool RecuSolve(Matrix<int> matrixParent, int x, int y /*, int protectMaxDepth, List<Matrix<int>> solution*/)
     {
-        watchdog++;
+        watchdog--;
 
-        if (watchdog >= 100000)
+        if (watchdog <= 0)
         {
             return false;//ver bien esto
         }
 
-        if (CanPlaceValue(matrixParent, 4, x, y))
+        if (_board[x,y].locked)
         {
-            matrixParent[x, y] = 4;
+            return RecuSolve(matrixParent, matrixParent.Width, y++);
+        }
+
+        for (int i = 0; i < 9; i++)
+        {
+            if (CanPlaceValue(matrixParent, i, x, y))
+            {
+                matrixParent[x, y] = i;
+            }
         }
 
 		return false;
@@ -113,11 +121,15 @@ public class Sudoku : MonoBehaviour {
         yield return new WaitForSeconds(0);
     }
 
-	void Update () {
-		if(Input.GetKeyDown(KeyCode.R) || Input.GetMouseButtonDown(1))
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetMouseButtonDown(1))
             SolvedSudoku();
-        else if(Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(0)) 
-            CreateSudoku();	
+        else if (Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(0)) {
+            CreateNew();
+            //CreateSudoku();
+        }
+    
 	}
 
 	//modificar lo necesario para que funcione.
@@ -127,10 +139,12 @@ public class Sudoku : MonoBehaviour {
         nums = new List<int>();
         var solution = new List<Matrix<int>>();
         watchdog = 100000;
-        var result =false;//????
+        var result =RecuSolve(_createdMatrix, 0 ,0);//????
         long mem = System.GC.GetTotalMemory(true);
         memory = string.Format("MEM: {0:f2}MB", mem / (1024f * 1024f));
         canSolve = result ? " VALID" : " INVALID";
+        TranslateAllValues(_createdMatrix);
+        //StartCoroutine(ShowSequence(_createdMatrix));
 		//???
     }
 
@@ -229,7 +243,12 @@ public class Sudoku : MonoBehaviour {
     }
     void CreateNew()
     {
-        _createdMatrix = new Matrix<int>(Tests.validBoards[1]);
+        _createdMatrix = new Matrix<int>(Tests.validBoards[Tests.validBoards.Length - 1]);
+
+        LockRandomCells();
+
+        ClearUnlocked(_createdMatrix);
+
         TranslateAllValues(_createdMatrix);
     }
 
