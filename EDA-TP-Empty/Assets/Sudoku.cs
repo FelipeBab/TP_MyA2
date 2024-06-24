@@ -77,21 +77,32 @@ public class Sudoku : MonoBehaviour {
 
         if (watchdog <= 0)
         {
+            Debug.LogError("WATCHDOG");
             return false;//ver bien esto
         }
 
         if (_board[x,y].locked)
         {
-            return RecuSolve(matrixParent, matrixParent.Width, y++);
+            for (int i = 0; i < 9; i++)
+            {
+                if (CanPlaceValue(matrixParent, i, x, y))
+                {
+                    matrixParent[x, y] = i;
+                }
+            }
+
+            if (x > matrixParent.Width)
+            {
+                x = 0;
+                return RecuSolve(matrixParent, x, y++);
+            }else if(x > matrixParent.Width && y > matrixParent.Height)
+            {
+                return true;
+            }
+
+            return RecuSolve(matrixParent, x++, y);
         }
 
-        for (int i = 0; i < 9; i++)
-        {
-            if (CanPlaceValue(matrixParent, i, x, y))
-            {
-                matrixParent[x, y] = i;
-            }
-        }
 
 		return false;
 	}
