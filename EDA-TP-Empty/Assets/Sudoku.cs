@@ -81,21 +81,38 @@ public class Sudoku : MonoBehaviour {
             return false;//ver bien esto
         }
 
-        if (_board[x,y].locked)
+        if (_board[x,y].locked == false)
         {
-            for (int i = 0; i < 9; i++)
+            for (int i = 1; i <= 9; i++)
             {
                 if (CanPlaceValue(matrixParent, i, x, y))
                 {
                     matrixParent[x, y] = i;
                 }
+
+                if (x > matrixParent.Width)
+                {
+                    x = 0;
+                    return RecuSolve(matrixParent, x, y++);
+                }
+                else if (x > matrixParent.Width && y > matrixParent.Height)
+                {
+                    return true;
+                }
+
+                return RecuSolve(matrixParent, x++, y);
             }
 
+            
+        }
+        else
+        {
             if (x > matrixParent.Width)
             {
                 x = 0;
                 return RecuSolve(matrixParent, x, y++);
-            }else if(x > matrixParent.Width && y > matrixParent.Height)
+            }
+            else if (x > matrixParent.Width && y > matrixParent.Height)
             {
                 return true;
             }
